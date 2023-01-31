@@ -1,22 +1,24 @@
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
 public class ClientHandler extends Thread {
     private Socket socket;
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd@HH:mm:ss");
-    private String pwd = "/root";
+    private Path pwd = Paths.get("root");
     public ClientHandler(Socket socket) {
         this.socket = socket;
-        System.out.print(getFormattedMessage("client connected."));
+        System.out.print(getFormattedMessage("client connected"));
     }
 
     public void run() {
         try {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             // send current default directory
-            out.writeUTF(pwd);
+            out.writeUTF(pwd.toString());
             InputStream in = socket.getInputStream();
 
             while (true) {
@@ -34,14 +36,13 @@ public class ClientHandler extends Thread {
                     case "cd":
                         String arg = command.getArgument();
                         System.out.print(getFormattedMessage(String.format("cd: %s/%s", pwd, arg)));
-                        pwd += "/" + arg;
+                        pwd = Paths.get();
+                        System.out.println(Paths.get("./root").toAbsolutePath().normalize());
                         out.writeUTF(pwd);
                         break;
                     default:
                         System.out.print(getFormattedMessage("no command"));
                 }
-
-                objIn.close();
             }
 
         }

@@ -1,4 +1,3 @@
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -19,7 +18,7 @@ public class cliClient {
         // get current default directory from server
         String currentDirectory = in.readUTF();
 
-        outer: while (true) {
+        while (true) {
             System.out.printf("%s ", currentDirectory);
             String[] command = scanner.nextLine().split(" ");
 
@@ -36,11 +35,11 @@ public class cliClient {
                     break;
                 default:
                     System.out.println("nope");
-                    break outer;
+                    break;
             }
         }
 
-        socket.close();
+        //socket.close();
     }
 
     private static String cd(String fileName) {
@@ -55,7 +54,6 @@ public class cliClient {
 
             DataInputStream in = new DataInputStream(socket.getInputStream());
             response = in.readUTF();
-
         }
         catch (IOException e) {
             response = "Error handling: " + e;
