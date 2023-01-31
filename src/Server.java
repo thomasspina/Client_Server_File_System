@@ -10,10 +10,13 @@ public class Server {
         Scanner scanner = new Scanner(System.in);
         String serverAddress = getServerAddress(scanner);
         System.out.println(serverAddress);
+        int port = getPort(scanner);
+        System.out.println(port);
     }
 
     private static String getServerAddress(Scanner scanner) {
         String address;
+
         outer: while (true) {
             System.out.print("Enter a valid IP address on which to run the server : ");
             address = scanner.nextLine();
@@ -38,10 +41,21 @@ public class Server {
                 }
             }
 
-
             break;
         }
 
         return address;
+    }
+
+    private static int getPort(Scanner scanner) {
+        int port;
+
+        do {
+            System.out.print("Enter a port number between 5000 and 5050 : ");
+            port = scanner.nextInt();
+
+        } while (port < 5000 || port > 5050);
+
+        return port;
     }
 }
