@@ -7,7 +7,6 @@ public class Server {
     private static ServerSocket listener;
 
     public static void main(String[] args) throws Exception {
-        int clientNumber = 0;
         Scanner scanner = new Scanner(System.in);
         String address = InputValidation.getAddress(scanner);
         int port = InputValidation.getPort(scanner);
@@ -21,7 +20,7 @@ public class Server {
 
         try {
             while (true) {
-                new ClientHandler(listener.accept(), clientNumber++).start();
+                new ClientHandler(listener.accept()).start();
             }
         } finally {
             listener.close();

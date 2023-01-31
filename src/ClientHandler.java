@@ -1,32 +1,52 @@
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
 public class ClientHandler extends Thread {
     private Socket socket;
-    private int clientNumber;
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd@HH:mm:ss");
-    public ClientHandler(Socket socket, int clientNumber) {
+    private String pwd = "/root";
+    public ClientHandler(Socket socket) {
         this.socket = socket;
-        this.clientNumber = clientNumber;
-        System.out.println(getFormattedMessage("client # " + clientNumber + "connected."));
+        System.out.print(getFormattedMessage("client connected."));
     }
 
     public void run() {
         try {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-            out.writeUTF("Hello from server - you are client#" + clientNumber + "\n");
-        } catch (IOException e) {
-            System.out.println("Error handling client# " + clientNumber + ": " + e + "\n");
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                System.out.println("Couldn't close a socket, what's going on?\n");
+            // send current default directory
+            out.writeUTF(pwd);
+            InputStream in = socket.getInputStream();
+
+            while (true) {
+                ObjectInputStream objIn = new ObjectInputStream(in);
+
+                Command command;
+                try {
+                    command = (Command) objIn.readObject();
+                } catch (ClassNotFoundException e) {
+                    System.out.println(e);
+                    continue;
+                }
+
+                switch (command.getCommand()) {
+                    case "cd":
+                        String arg = command.getArgument();
+                        System.out.print(getFormattedMessage(String.format("cd: %s/%s", pwd, arg)));
+                        pwd += "/" + arg;
+                        out.writeUTF(pwd);
+                        break;
+                    default:
+                        System.out.print(getFormattedMessage("no command"));
+                }
+
+                objIn.close();
             }
-            System.out.println("Connection with client# " + clientNumber + " closed\n");
+
+        }
+        catch (IOException e) {
+            System.out.println(getFormattedMessage("Error handling: " + e));
         }
     }
 
@@ -39,4 +59,6 @@ public class ClientHandler extends Thread {
                 dateTimeFormatter.format(now),
                 message);
     }
+
+
 }
