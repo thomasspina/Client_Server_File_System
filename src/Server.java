@@ -14,15 +14,30 @@ public class Server {
 
     private static String getServerAddress(Scanner scanner) {
         String address;
-        while (true) {
+        outer: while (true) {
             System.out.print("Enter a valid IP address on which to run the server : ");
             address = scanner.nextLine();
 
-            String[] str = address.split("\\.");
-            if (str.length != 4) {
-                System.out.println("INVALID : The IP address is too long.\n");
+            String[] splitAddress = address.split("\\.");
+            if (splitAddress.length != 4) {
+                System.out.println("INVALID : The IP address is not of the right length.\n");
                 continue;
             }
+
+            for (String ipFragment : splitAddress) {
+                try {
+                    int num = Integer.parseInt(ipFragment);
+                    if (num > 255 || num < 0) {
+                        System.out.printf("INVALID : %s is not in the 0 to 255 inclusive range.\n\n", ipFragment);
+                        continue outer;
+                    }
+                }
+                catch (NumberFormatException ex) {
+                    System.out.printf("INVALID : '%s' is not an integer.\n\n", ipFragment);
+                    continue outer;
+                }
+            }
+
 
             break;
         }
