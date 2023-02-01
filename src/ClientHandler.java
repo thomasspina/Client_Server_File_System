@@ -37,8 +37,16 @@ public class ClientHandler extends Thread {
                     case "cd":
                         String arg = command.getArgument();
                         System.out.print(getFormattedMessage(String.format("cd: %s/%s", pwd, arg)));
+
                         if (arg.equals("..")) {
-                            
+                            if (pwd.equals(Paths.get("root"))) {
+                                out.writeUTF("Error: already in root");
+                                break;
+                            }
+
+                            pwd = pwd.getParent();
+                            out.writeUTF(pwd.toString());
+                            break;
                         }
 
                         Path path = Paths.get(pwd.toString() + "/" + arg);
