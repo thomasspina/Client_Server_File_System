@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
@@ -34,11 +35,29 @@ public class ClientHandler extends Thread {
 
                 switch (command.getCommand()) {
                     case "cd":
-//                        String arg = command.getArgument();
-//                        System.out.print(getFormattedMessage(String.format("cd: %s/%s", pwd, arg)));
-//                        pwd = Paths.get();
-//                        System.out.println(Paths.get("./root").toAbsolutePath().normalize());
-//                        out.writeUTF(pwd);
+                        String arg = command.getArgument();
+                        System.out.print(getFormattedMessage(String.format("cd: %s/%s", pwd, arg)));
+
+                        if (arg.equals("..")) {
+                            if (pwd.equals(Paths.get("root"))) {
+                                out.writeUTF("Error: already in root");
+                                break;
+                            }
+
+                            pwd = pwd.getParent();
+                            out.writeUTF(pwd.toString());
+                            break;
+                        }
+
+                        Path path = Paths.get(pwd.toString() + "/" + arg);
+                        if (Files.exists(path) && Files.isDirectory(path)) {
+                            pwd = path;
+                            out.writeUTF(pwd.toString());
+                        } else if (Files.isRegularFile(path)) {
+                            out.writeUTF(String.format("Error: not a directory: %s", path));
+                        } else {
+                            out.writeUTF(String.format("Error: no such file or directory: %s", path));
+                        }
                         break;
                     case "ls":
                         System.out.print(getFormattedMessage("ls"));
