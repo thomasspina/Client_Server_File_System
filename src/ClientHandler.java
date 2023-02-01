@@ -34,11 +34,28 @@ public class ClientHandler extends Thread {
 
                 switch (command.getCommand()) {
                     case "cd":
-                        String arg = command.getArgument();
-                        System.out.print(getFormattedMessage(String.format("cd: %s/%s", pwd, arg)));
-                        pwd = Paths.get();
-                        System.out.println(Paths.get("./root").toAbsolutePath().normalize());
-                        out.writeUTF(pwd);
+//                        String arg = command.getArgument();
+//                        System.out.print(getFormattedMessage(String.format("cd: %s/%s", pwd, arg)));
+//                        pwd = Paths.get();
+//                        System.out.println(Paths.get("./root").toAbsolutePath().normalize());
+//                        out.writeUTF(pwd);
+                        break;
+                    case "ls":
+                        System.out.print(getFormattedMessage("ls"));
+                        File directory = new File(pwd.toString());
+                        String[] fileArray = directory.list();
+                        String outputString = "";
+                        for(String fileName : fileArray) {
+                            File file = new File(pwd + "/" + fileName);
+                            if(file.isDirectory()){
+                                outputString += "[Folder] " + fileName + "\n";
+                            }
+                            else {
+                                outputString += "[File] " + fileName + "\n";
+                            }
+
+                        }
+                        out.writeUTF(outputString);
                         break;
                     default:
                         System.out.print(getFormattedMessage("no command"));

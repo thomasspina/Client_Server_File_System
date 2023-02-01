@@ -33,6 +33,9 @@ public class cliClient {
                     }
                     currentDirectory = response;
                     break;
+                case "ls":
+                    System.out.println(ls());
+                    break;
                 default:
                     System.out.println("nope");
                     break;
@@ -63,7 +66,21 @@ public class cliClient {
     }
 
     private static String ls() {
-        return "";
+        String response;
+        try {
+            Command command = new Command("ls");
+            OutputStream out = socket.getOutputStream();
+            ObjectOutputStream objOut = new ObjectOutputStream(out);
+
+            objOut.writeObject(command);
+
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            response = in.readUTF();
+
+        } catch (IOException e) {
+            response = "Error handling: " + e;
+        }
+        return response;
     }
 
     private static boolean mkdir() {
