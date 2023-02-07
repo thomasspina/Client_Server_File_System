@@ -58,7 +58,23 @@ public class ClientHandler extends Thread {
                         } else {
                             out.writeUTF(String.format("Error: no such file or directory: %s", path));
                         }
+                        break;
+                    case "ls":
+                        System.out.print(getFormattedMessage("ls"));
+                        File directory = new File(pwd.toString());
+                        String[] fileArray = directory.list();
+                        String outputString = "";
+                        for(String fileName : fileArray) {
+                            File file = new File(pwd + "/" + fileName);
+                            if(file.isDirectory()){
+                                outputString += "[Folder] " + fileName + "\n";
+                            }
+                            else {
+                                outputString += "[File] " + fileName + "\n";
+                            }
 
+                        }
+                        out.writeUTF(outputString);
                         break;
                     default:
                         System.out.print(getFormattedMessage("no command"));
