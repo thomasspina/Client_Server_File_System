@@ -80,6 +80,4 @@ public class ClientHandler extends Thread {
                 dateTimeFormatter.format(now),
                 message);
     }
-
-
 }
