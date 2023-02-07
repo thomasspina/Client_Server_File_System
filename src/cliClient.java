@@ -36,6 +36,14 @@ public class cliClient {
                 case "ls":
                     System.out.println(ls());
                     break;
+                case "mkdir":
+                    String dirName = command[1];
+                    String resp = mkdir(dirName);
+                    if (resp.startsWith("Error")) {
+                        System.out.println(resp);
+                        break;
+                    }
+                    currentDirectory = resp;
                 default:
                     System.out.println("nope");
                     break;
@@ -83,8 +91,24 @@ public class cliClient {
         return response;
     }
 
-    private static boolean mkdir() {
-        return false;
+    private static String mkdir(String dirName) {
+        String response;
+        try {
+            Command command = new Command("mkdir", dirName);
+
+            OutputStream out = socket.getOutputStream();
+            ObjectOutputStream objOut = new ObjectOutputStream(out);
+
+            objOut.writeObject(command);
+
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            response = in.readUTF();
+        }
+        catch (IOException e) {
+            response = "Error handling: " + e;
+        }
+
+        return response;
     }
 
     private static boolean upload(String name) {
