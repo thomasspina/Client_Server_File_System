@@ -83,6 +83,26 @@ public class ClientHandler extends Thread {
                         out.writeUTF("You have been disconnected.");
                         System.out.print(getFormattedMessage("exit"));
                         break run_loop;
+
+                    case "mkdir":
+                        String dir = command.getArgument();
+                        System.out.print(getFormattedMessage(String.format("cd: %s/%s", pwd, dir)));
+
+                        Path newPath = Paths.get(pwd.toString()+ "/" + dir);
+                        File file = new File(newPath.toUri());
+                        if (Files.exists(newPath) && Files.isDirectory(newPath)){
+                            out.writeUTF(String.format("Directory already exists"));
+                        }
+                        else {
+                            boolean result = file.mkdir();
+                            if (result) {
+                                out.writeUTF(String.format("Directory created successfully \n", pwd.toString()));
+                            }
+                            else {
+                                out.writeUTF(String.format("Could not create directory"));
+                            }
+                        }
+                        break;
                     default:
                         System.out.print(getFormattedMessage("no command"));
                 }
@@ -104,4 +124,3 @@ public class ClientHandler extends Thread {
                 dateTimeFormatter.format(now),
                 message);
     }
-}
