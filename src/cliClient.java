@@ -19,8 +19,8 @@ public class cliClient {
         String currentDirectory = in.readUTF();
 
         client_loop: while (true) {
-            System.out.printf("%s ", currentDirectory);
             String[] command = scanner.nextLine().split(" ");
+
 
             switch (command[0]) {
                 case "cd":
@@ -55,9 +55,12 @@ public class cliClient {
                 default:
                     break;
             }
+
+            System.out.printf("%s ", currentDirectory);
         }
 
         socket.close();
+
     }
 
     private static String simpleCommand(String commandName) { return simpleCommand(commandName, null); }
