@@ -22,7 +22,7 @@ public class ClientHandler extends Thread {
             out.writeUTF(pwd.toString());
             InputStream in = socket.getInputStream();
 
-            while (true) {
+            run_loop: while (true) {
                 ObjectInputStream objIn = new ObjectInputStream(in);
 
                 Command command;
@@ -63,24 +63,32 @@ public class ClientHandler extends Thread {
                         System.out.print(getFormattedMessage("ls"));
                         File directory = new File(pwd.toString());
                         String[] fileArray = directory.list();
-                        String outputString = "";
+                        StringBuilder outputString = new StringBuilder();
+
+                        assert fileArray != null;
                         for(String fileName : fileArray) {
                             File file = new File(pwd + "/" + fileName);
                             if(file.isDirectory()){
-                                outputString += "[Folder] " + fileName + "\n";
+                                outputString.append("[Folder] ").append(fileName).append("\n");
                             }
                             else {
-                                outputString += "[File] " + fileName + "\n";
+                                outputString.append("[File] ").append(fileName).append("\n");
                             }
 
                         }
-                        out.writeUTF(outputString);
+                        out.writeUTF(outputString.toString());
                         break;
+
+                    case "exit":
+                        out.writeUTF("You have been disconnected.");
+                        System.out.print(getFormattedMessage("exit"));
+                        break run_loop;
                     default:
                         System.out.print(getFormattedMessage("no command"));
                 }
             }
-
+            socket.close();
+            System.out.print(getFormattedMessage("client has disconnected"));
         }
         catch (IOException e) {
             System.out.println(getFormattedMessage("Error handling: " + e));
