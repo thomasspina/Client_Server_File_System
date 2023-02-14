@@ -10,6 +10,7 @@ public class ClientHandler extends Thread {
     private Socket socket;
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd@HH:mm:ss");
     private Path pwd = Paths.get("root");
+
     public ClientHandler(Socket socket) {
         this.socket = socket;
         System.out.print(getFormattedMessage("client connected"));
@@ -22,7 +23,8 @@ public class ClientHandler extends Thread {
             out.writeUTF(pwd.toString());
             InputStream in = socket.getInputStream();
 
-            run_loop: while (true) {
+            run_loop:
+            while (true) {
                 ObjectInputStream objIn = new ObjectInputStream(in);
 
                 Command command;
@@ -66,12 +68,11 @@ public class ClientHandler extends Thread {
                         StringBuilder outputString = new StringBuilder();
 
                         assert fileArray != null;
-                        for(String fileName : fileArray) {
+                        for (String fileName : fileArray) {
                             File file = new File(pwd + "/" + fileName);
-                            if(file.isDirectory()){
+                            if (file.isDirectory()) {
                                 outputString.append("[Folder] ").append(fileName).append("\n");
-                            }
-                            else {
+                            } else {
                                 outputString.append("[File] ").append(fileName).append("\n");
                             }
 
@@ -88,17 +89,15 @@ public class ClientHandler extends Thread {
                         String dir = command.getArgument();
                         System.out.print(getFormattedMessage(String.format("cd: %s/%s", pwd, dir)));
 
-                        Path newPath = Paths.get(pwd.toString()+ "/" + dir);
+                        Path newPath = Paths.get(pwd.toString() + "/" + dir);
                         File file = new File(newPath.toUri());
-                        if (Files.exists(newPath) && Files.isDirectory(newPath)){
+                        if (Files.exists(newPath) && Files.isDirectory(newPath)) {
                             out.writeUTF(String.format("Directory already exists"));
-                        }
-                        else {
+                        } else {
                             boolean result = file.mkdir();
                             if (result) {
                                 out.writeUTF(String.format("Directory created successfully \n", pwd.toString()));
-                            }
-                            else {
+                            } else {
                                 out.writeUTF(String.format("Could not create directory"));
                             }
                         }
@@ -109,8 +108,7 @@ public class ClientHandler extends Thread {
             }
             socket.close();
             System.out.print(getFormattedMessage("client has disconnected"));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println(getFormattedMessage("Error handling: " + e));
         }
     }
@@ -124,3 +122,4 @@ public class ClientHandler extends Thread {
                 dateTimeFormatter.format(now),
                 message);
     }
+}
