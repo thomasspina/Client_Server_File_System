@@ -51,7 +51,8 @@ public class cliClient {
                         System.out.println(resp);
                         break;
                     }
-                    currentDirectory = resp;
+                    System.out.println(resp);
+                    break;
                 default:
                     break;
             }

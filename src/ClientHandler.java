@@ -87,7 +87,7 @@ public class ClientHandler extends Thread {
 
                     case "mkdir":
                         String dir = command.getArgument();
-                        System.out.print(getFormattedMessage(String.format("cd: %s/%s", pwd, dir)));
+                        System.out.print(getFormattedMessage(String.format("mkdir: %s", dir)));
 
                         Path newPath = Paths.get(pwd.toString() + "/" + dir);
                         File file = new File(newPath.toUri());
