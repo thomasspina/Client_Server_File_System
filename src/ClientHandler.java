@@ -102,6 +102,27 @@ public class ClientHandler extends Thread {
                             }
                         }
                         break;
+                    case "upload":
+                        String fileName = command.getArgument();
+                        System.out.print(getFormattedMessage(String.format("upload %s", fileName)));
+                        DataInputStream dataIn = new DataInputStream(in);
+                        file = new File(pwd.toString() + '/' + fileName);
+                        FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+                        if (!file.exists()) {
+                            file.createNewFile();
+                        }
+                        long size = dataIn.readLong();
+                        int bytes = 0;
+                        byte[] buffer = new byte[4 * 1024];
+                        while (size > 0 && (bytes = dataIn.read(buffer, 0, (int)Math.min(buffer.length, size)))
+                                != -1) {
+                            fileOutputStream.write(buffer, 0, bytes);
+                            size -= bytes;
+                        }
+                        fileOutputStream.close();
+                        out.writeUTF(String.format("%s file has been uploaded", fileName));
+                        break;
                     default:
                         System.out.print(getFormattedMessage("no command"));
                 }

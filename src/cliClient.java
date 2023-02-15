@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 public class cliClient {
     private static Socket socket;
+
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
 
@@ -46,12 +47,17 @@ public class cliClient {
                     break;
                 case "mkdir":
                     String dirName = command[1];
-                    String resp = mkdir(dirName);
+                    String resp = simpleCommand("mkdir", dirName);
                     if (resp.startsWith("Error")) {
                         System.out.println(resp);
                         break;
                     }
                     System.out.println(resp);
+                    break;
+                case "upload":
+                    fileName = command[1];
+                    res = upload(fileName);
+                    System.out.println(res);
                     break;
                 default:
                     break;
@@ -86,45 +92,35 @@ public class cliClient {
 
         return response;
     }
-    private static String ls() {
+    private static String upload(String fileName) {
         String response;
         try {
-            Command command = new Command("ls");
+            Command command = new Command("upload",fileName);
+            int bytes = 0;
             OutputStream out = socket.getOutputStream();
+            DataOutputStream dataOut = new DataOutputStream(out);
             ObjectOutputStream objOut = new ObjectOutputStream(out);
-
             objOut.writeObject(command);
 
-            DataInputStream in = new DataInputStream(socket.getInputStream());
-            response = in.readUTF();
-
-        } catch (IOException e) {
-            response = "Error handling: " + e;
-        }
-        return response;
-    }
-
-    private static String mkdir(String dirName) {
-        String response;
-        try {
-            Command command = new Command("mkdir", dirName);
-
-            OutputStream out = socket.getOutputStream();
-            ObjectOutputStream objOut = new ObjectOutputStream(out);
-
-            objOut.writeObject(command);
+            String path = System.getProperty("user.dir") + '/' + fileName;
+            File file = new File(path);
+            FileInputStream fileInputStream = new FileInputStream(file);
+            dataOut.writeLong(file.length());
+            byte[] buffer = new byte[4 * 1024];
+            while ((bytes = fileInputStream.read(buffer))
+                    != -1) {
+                dataOut.write(buffer, 0, bytes);
+                dataOut.flush();
+            }
+            fileInputStream.close();
 
             DataInputStream in = new DataInputStream(socket.getInputStream());
             response = in.readUTF();
         }
-        catch (IOException e) {
-            response = "Error handling: " + e;
+        catch (IOException e){
+            response = "Error handling" + e;
         }
-
         return response;
-    }
-    private static boolean upload(String name) {
-        return false;
     }
 
     private static File download(String name) {
