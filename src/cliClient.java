@@ -59,6 +59,11 @@ public class cliClient {
                     res = upload(fileName);
                     System.out.println(res);
                     break;
+                case "download":
+                    String downloadFileName = command[1];
+                    res = download(downloadFileName);
+                    System.out.println(res);
+                    break;
                 default:
                     break;
             }
@@ -123,7 +128,40 @@ public class cliClient {
         return response;
     }
 
-    private static File download(String name) {
-        return new File("");
+    private static String download(String downloadFileName) {
+        String response;
+        try {
+            Command command = new Command("download",downloadFileName);
+            DataInputStream downloadIn = new DataInputStream(socket.getInputStream());
+            DataOutputStream downloadOut = new DataOutputStream(socket.getOutputStream());
+
+            ObjectOutputStream downloadObjOut = new ObjectOutputStream(downloadOut);
+            downloadObjOut.writeObject(command);
+
+            String downloadPath = System.getProperty("user.dir") + '/' + downloadFileName;
+            File downloadFile = new File(downloadPath);
+            FileOutputStream fileOutputStream = new FileOutputStream(downloadFile);
+
+            if (!downloadFile.exists()) {
+                downloadFile.createNewFile();
+            }
+            long downloadSize = downloadIn.readLong();
+            int downloadBytes;
+            byte[] buffer = new byte[4 * 1024];
+
+            while (downloadSize > 0 && (downloadBytes = downloadIn.read(buffer, 0, (int)Math.min(buffer.length, downloadSize)))
+                    != -1) {
+                fileOutputStream.write(buffer, 0, downloadBytes);
+                downloadSize -= downloadBytes;
+            }
+            fileOutputStream.close();
+
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            response = in.readUTF();
+        }
+        catch (IOException e){
+            response = "Error handling" + e;
+        }
+        return response;
     }
 }

@@ -123,6 +123,30 @@ public class ClientHandler extends Thread {
                         fileOutputStream.close();
                         out.writeUTF(String.format("%s file has been uploaded", fileName));
                         break;
+
+                    case "download":
+                        String downloadFileName = command.getArgument();
+                        System.out.print(getFormattedMessage(String.format("download %s", downloadFileName)));
+
+                        DataOutputStream downloadOut = new DataOutputStream(socket.getOutputStream());
+
+                        int downloadBytes;
+                        File downloadFile = new File(pwd.toString() + '/' + downloadFileName);
+                        FileInputStream downloadFileInputStream = new FileInputStream(downloadFile);
+
+                        downloadOut.writeLong(downloadFile.length());
+
+                        byte[] downloadBuffer = new byte[4 * 1024];
+
+                        while ((downloadBytes = downloadFileInputStream.read(downloadBuffer))
+                                != -1) {
+                            downloadOut.write(downloadBuffer, 0, downloadBytes);
+                            downloadOut.flush();
+                        }
+                        downloadFileInputStream.close();
+
+                        out.writeUTF(String.format("%s file has been downloaded", downloadFileName));
+                        break;
                     default:
                         System.out.print(getFormattedMessage("no command"));
                 }
