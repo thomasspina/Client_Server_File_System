@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/cs_fs.iml" filepath="$PROJECT_DIR$/cs_fs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Client_Server_File_System.iml" filepath="$PROJECT_DIR$/.idea/Client_Server_File_System.iml" />
     </modules>
   </component>
 </project>
