@@ -92,13 +92,13 @@ public class ClientHandler extends Thread {
                         Path newPath = Paths.get(pwd.toString() + "/" + dir);
                         File file = new File(newPath.toUri());
                         if (Files.exists(newPath) && Files.isDirectory(newPath)) {
-                            out.writeUTF(String.format("Directory already exists"));
+                            out.writeUTF("Directory already exists");
                         } else {
                             boolean result = file.mkdir();
                             if (result) {
-                                out.writeUTF(String.format("Directory created successfully \n", pwd.toString()));
+                                out.writeUTF("Directory created successfully \n");
                             } else {
-                                out.writeUTF(String.format("Could not create directory"));
+                                out.writeUTF("Could not create directory");
                             }
                         }
                         break;
